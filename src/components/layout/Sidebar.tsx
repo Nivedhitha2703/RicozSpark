@@ -11,35 +11,82 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react'
+import { NavLink } from 'react-router-dom'
 
 const navigation = [
   {
     label: 'DASHBOARD',
-    items: [{ label: 'Dashboard', icon: Gauge }],
+    items: [
+      {
+        label: 'Dashboard',
+        icon: Gauge,
+        path: '/',
+      },
+    ],
   },
   {
     label: 'IDEAS',
     items: [
-      { label: 'Discover', icon: Lightbulb },
-      { label: 'Trending', icon: TrendingUp },
-      { label: 'Recent', icon: ListChecks },
-      { label: 'My Ideas', icon: Bookmark },
+      {
+        label: 'Discover',
+        icon: Lightbulb,
+        path: '/ideas',
+      },
+      {
+        label: 'Trending',
+        icon: TrendingUp,
+        path: '/ideas/trending',
+      },
+      {
+        label: 'Recent',
+        icon: ListChecks,
+        path: '/ideas/recent',
+      },
+      {
+        label: 'My Ideas',
+        icon: Bookmark,
+        path: '/ideas/my',
+      },
     ],
   },
   {
     label: 'INNOVATION',
     items: [
-      { label: 'Review Queue', icon: ListChecks },
-      { label: 'Evaluation', icon: BarChart3 },
-      { label: 'Pipeline', icon: TrendingUp },
-      { label: 'Projects', icon: FolderKanban },
+      {
+        label: 'Review Queue',
+        icon: ListChecks,
+        path: '/review',
+      },
+      {
+        label: 'Evaluation',
+        icon: BarChart3,
+        path: '/evaluation',
+      },
+      {
+        label: 'Pipeline',
+        icon: TrendingUp,
+        path: '/pipeline',
+      },
+      {
+        label: 'Projects',
+        icon: FolderKanban,
+        path: '/projects',
+      },
     ],
   },
   {
     label: 'INSIGHTS',
     items: [
-      { label: 'Analytics', icon: BarChart3 },
-      { label: 'Outcomes', icon: TrendingUp },
+      {
+        label: 'Analytics',
+        icon: BarChart3,
+        path: '/analytics',
+      },
+      {
+        label: 'Outcomes',
+        icon: TrendingUp,
+        path: '/outcomes',
+      },
     ],
   },
 ]
@@ -47,6 +94,7 @@ const navigation = [
 export function Sidebar() {
   return (
     <aside className="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-border bg-surface">
+      {/* Brand */}
       <div className="flex h-16 items-center border-b border-border px-5">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
@@ -65,6 +113,7 @@ export function Sidebar() {
         </div>
       </div>
 
+      {/* Main navigation */}
       <nav className="flex-1 overflow-y-auto px-3 py-5">
         {navigation.map((section) => (
           <div key={section.label} className="mb-6">
@@ -77,14 +126,23 @@ export function Sidebar() {
                 const Icon = item.icon
 
                 return (
-                  <button
+                  <NavLink
                     key={item.label}
-                    type="button"
-                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-muted transition hover:bg-background hover:text-foreground"
+                    to={item.path}
+                    end={item.path === '/'}
+                    className={({ isActive }) =>
+                      [
+                        'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition',
+                        isActive
+                          ? 'bg-primary/10 text-primary'
+                          : 'text-muted hover:bg-background hover:text-foreground',
+                      ].join(' ')
+                    }
                   >
                     <Icon className="h-4 w-4 shrink-0" />
+
                     <span>{item.label}</span>
-                  </button>
+                  </NavLink>
                 )
               })}
             </div>
@@ -92,30 +150,52 @@ export function Sidebar() {
         ))}
       </nav>
 
+      {/* Bottom navigation */}
       <div className="border-t border-border p-3">
-        <button
-          type="button"
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted transition hover:bg-background hover:text-foreground"
+        <NavLink
+          to="/notifications"
+          className={({ isActive }) =>
+            [
+              'flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition',
+              isActive
+                ? 'bg-primary/10 text-primary'
+                : 'text-muted hover:bg-background hover:text-foreground',
+            ].join(' ')
+          }
         >
           <Bell className="h-4 w-4" />
-          Notifications
-        </button>
+          <span>Notifications</span>
+        </NavLink>
 
-        <button
-          type="button"
-          className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted transition hover:bg-background hover:text-foreground"
+        <NavLink
+          to="/profile"
+          className={({ isActive }) =>
+            [
+              'mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition',
+              isActive
+                ? 'bg-primary/10 text-primary'
+                : 'text-muted hover:bg-background hover:text-foreground',
+            ].join(' ')
+          }
         >
           <Users className="h-4 w-4" />
-          Profile
-        </button>
+          <span>Profile</span>
+        </NavLink>
 
-        <button
-          type="button"
-          className="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-muted transition hover:bg-background hover:text-foreground"
+        <NavLink
+          to="/settings"
+          className={({ isActive }) =>
+            [
+              'mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition',
+              isActive
+                ? 'bg-primary/10 text-primary'
+                : 'text-muted hover:bg-background hover:text-foreground',
+            ].join(' ')
+          }
         >
           <Settings className="h-4 w-4" />
-          Settings
-        </button>
+          <span>Settings</span>
+        </NavLink>
       </div>
     </aside>
   )
