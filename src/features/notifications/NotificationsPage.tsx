@@ -21,9 +21,15 @@ function formatNotificationTime(dateString: string) {
   const now = new Date()
 
   const difference = now.getTime() - date.getTime()
-  const minutes = Math.floor(difference / (1000 * 60))
-  const hours = Math.floor(difference / (1000 * 60 * 60))
-  const days = Math.floor(difference / (1000 * 60 * 60 * 24))
+  const minutes = Math.floor(
+    difference / (1000 * 60),
+  )
+  const hours = Math.floor(
+    difference / (1000 * 60 * 60),
+  )
+  const days = Math.floor(
+    difference / (1000 * 60 * 60 * 24),
+  )
 
   if (minutes < 1) return 'Just now'
   if (minutes < 60) return `${minutes}m ago`
@@ -48,9 +54,15 @@ function getNotificationIcon(type: string) {
 }
 
 export function NotificationsPage() {
-  const [notifications, setNotifications] = useState<Notification[]>([])
-  const [loading, setLoading] = useState(true)
-  const [actionLoading, setActionLoading] = useState<string | null>(null)
+  const [notifications, setNotifications] =
+    useState<Notification[]>([])
+
+  const [loading, setLoading] =
+    useState(true)
+
+  const [actionLoading, setActionLoading] =
+    useState<string | null>(null)
+
   const [error, setError] = useState('')
 
   async function loadNotifications() {
@@ -59,6 +71,7 @@ export function NotificationsPage() {
       setLoading(true)
 
       const data = await getNotifications()
+
       setNotifications(data)
     } catch (err) {
       console.error(err)
@@ -73,20 +86,42 @@ export function NotificationsPage() {
     }
   }
 
+  /*
+   * Defer the initial data load so the effect itself
+   * does not synchronously trigger state updates.
+   */
   useEffect(() => {
-    void loadNotifications()
+    let cancelled = false
+
+    const timer = window.setTimeout(() => {
+      if (!cancelled) {
+        void loadNotifications()
+      }
+    }, 0)
+
+    return () => {
+      cancelled = true
+      window.clearTimeout(timer)
+    }
   }, [])
 
-  async function handleMarkAsRead(notificationId: string) {
+  async function handleMarkAsRead(
+    notificationId: string,
+  ) {
     try {
       setActionLoading(notificationId)
 
-      await markNotificationAsRead(notificationId)
+      await markNotificationAsRead(
+        notificationId,
+      )
 
       setNotifications((current) =>
         current.map((notification) =>
           notification.id === notificationId
-            ? { ...notification, is_read: true }
+            ? {
+                ...notification,
+                is_read: true,
+              }
             : notification,
         ),
       )
@@ -146,8 +181,9 @@ export function NotificationsPage() {
           </h1>
 
           <p className="mt-2 max-w-2xl text-sm text-muted">
-            Stay updated on your ideas, reviews, decisions, and other
-            innovation activity.
+            Stay updated on your ideas, reviews,
+            decisions, and other innovation
+            activity.
           </p>
         </div>
 
@@ -181,7 +217,9 @@ export function NotificationsPage() {
               {notifications.length === 0
                 ? 'No notifications'
                 : `${notifications.length} notification${
-                    notifications.length === 1 ? '' : 's'
+                    notifications.length === 1
+                      ? ''
+                      : 's'
                   }`}
             </p>
 
@@ -212,123 +250,136 @@ export function NotificationsPage() {
       )}
 
       {/* Empty state */}
-      {!loading && !error && notifications.length === 0 && (
-        <div className="flex min-h-72 flex-col items-center justify-center rounded-xl border border-border bg-surface px-6 text-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <Bell className="h-6 w-6" />
+      {!loading &&
+        !error &&
+        notifications.length === 0 && (
+          <div className="flex min-h-72 flex-col items-center justify-center rounded-xl border border-border bg-surface px-6 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <Bell className="h-6 w-6" />
+            </div>
+
+            <h2 className="mt-4 text-base font-semibold">
+              You're all caught up
+            </h2>
+
+            <p className="mt-2 max-w-md text-sm text-muted">
+              Notifications about your ideas,
+              reviews, and innovation activity
+              will appear here.
+            </p>
           </div>
-
-          <h2 className="mt-4 text-base font-semibold">
-            You're all caught up
-          </h2>
-
-          <p className="mt-2 max-w-md text-sm text-muted">
-            Notifications about your ideas, reviews, and innovation
-            activity will appear here.
-          </p>
-        </div>
-      )}
+        )}
 
       {/* Notification list */}
-      {!loading && notifications.length > 0 && (
-        <div className="overflow-hidden rounded-xl border border-border bg-surface">
-          <div className="divide-y divide-border">
-            {notifications.map((notification) => {
-              const unread = !notification.is_read
-              const isMarking =
-                actionLoading === notification.id
+      {!loading &&
+        notifications.length > 0 && (
+          <div className="overflow-hidden rounded-xl border border-border bg-surface">
+            <div className="divide-y divide-border">
+              {notifications.map(
+                (notification) => {
+                  const unread =
+                    !notification.is_read
 
-              return (
-                <div
-                  key={notification.id}
-                  className={`flex gap-4 px-5 py-5 transition ${
-                    unread
-                      ? 'bg-primary/[0.035]'
-                      : 'bg-surface'
-                  }`}
-                >
-                  {/* Icon */}
-                  <div
-                    className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-                      unread
-                        ? 'bg-primary/10 text-primary'
-                        : 'bg-background text-muted'
-                    }`}
-                  >
-                    {getNotificationIcon(
-                      notification.notification_type,
-                    )}
-                  </div>
+                  const isMarking =
+                    actionLoading ===
+                    notification.id
 
-                  {/* Content */}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
-                      <div className="flex items-center gap-2">
-                        <h2
-                          className={`text-sm ${
-                            unread
-                              ? 'font-semibold text-foreground'
-                              : 'font-medium text-foreground'
-                          }`}
-                        >
-                          {notification.title}
-                        </h2>
-
-                        {unread && (
-                          <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary-foreground">
-                            New
-                          </span>
+                  return (
+                    <div
+                      key={notification.id}
+                      className={`flex gap-4 px-5 py-5 transition ${
+                        unread
+                          ? 'bg-primary/[0.035]'
+                          : 'bg-surface'
+                      }`}
+                    >
+                      {/* Icon */}
+                      <div
+                        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
+                          unread
+                            ? 'bg-primary/10 text-primary'
+                            : 'bg-background text-muted'
+                        }`}
+                      >
+                        {getNotificationIcon(
+                          notification.notification_type,
                         )}
                       </div>
 
-                      <span className="shrink-0 text-xs text-muted">
-                        {formatNotificationTime(
-                          notification.created_at,
-                        )}
-                      </span>
-                    </div>
+                      {/* Content */}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
+                          <div className="flex items-center gap-2">
+                            <h2
+                              className={`text-sm ${
+                                unread
+                                  ? 'font-semibold text-foreground'
+                                  : 'font-medium text-foreground'
+                              }`}
+                            >
+                              {notification.title}
+                            </h2>
 
-                    <p className="mt-1 text-sm leading-6 text-muted">
-                      {notification.message}
-                    </p>
+                            {unread && (
+                              <span className="rounded-full bg-primary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary-foreground">
+                                New
+                              </span>
+                            )}
+                          </div>
 
-                    <div className="mt-3 flex flex-wrap items-center gap-3">
-                      {notification.link && (
-                        <Link
-                          to={notification.link}
-                          className="inline-flex items-center gap-1.5 text-xs font-medium text-primary transition hover:opacity-80"
-                        >
-                          View details
-                          <ExternalLink className="h-3.5 w-3.5" />
-                        </Link>
-                      )}
+                          <span className="shrink-0 text-xs text-muted">
+                            {formatNotificationTime(
+                              notification.created_at,
+                            )}
+                          </span>
+                        </div>
 
-                      {unread && (
-                        <button
-                          type="button"
-                          onClick={() =>
-                            handleMarkAsRead(notification.id)
-                          }
-                          disabled={isMarking}
-                          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted transition hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          {isMarking ? (
-                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                          ) : (
-                            <Check className="h-3.5 w-3.5" />
+                        <p className="mt-1 text-sm leading-6 text-muted">
+                          {notification.message}
+                        </p>
+
+                        <div className="mt-3 flex flex-wrap items-center gap-3">
+                          {notification.link && (
+                            <Link
+                              to={
+                                notification.link
+                              }
+                              className="inline-flex items-center gap-1.5 text-xs font-medium text-primary transition hover:opacity-80"
+                            >
+                              View details
+                              <ExternalLink className="h-3.5 w-3.5" />
+                            </Link>
                           )}
 
-                          Mark as read
-                        </button>
-                      )}
+                          {unread && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleMarkAsRead(
+                                  notification.id,
+                                )
+                              }
+                              disabled={isMarking}
+                              className="inline-flex items-center gap-1.5 text-xs font-medium text-muted transition hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
+                            >
+                              {isMarking ? (
+                                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                              ) : (
+                                <Check className="h-3.5 w-3.5" />
+                              )}
+
+                              Mark as read
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              )
-            })}
+                  )
+                },
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
     </section>
   )
 }
