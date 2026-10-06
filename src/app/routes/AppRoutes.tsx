@@ -1,53 +1,48 @@
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 
 import { ProtectedRoute } from '../../features/auth/ProtectedRoute'
 import { LoginPage } from '../../features/auth/LoginPage'
 import { SignupPage } from '../../features/auth/SignupPage'
+import { ForgotPasswordPage } from '../../features/auth/ForgotPasswordPage'
+import { ResetPasswordPage } from '../../features/auth/ResetPasswordPage'
 
 import { DashboardPage } from '../../features/dashboard/DashboardPage'
 
-import { SubmitIdeaPage } from '../../features/ideas/SubmitIdeaPage'
-import { MyIdeasPage } from '../../features/ideas/MyIdeasPage'
-import { IdeaDetailPage } from '../../features/ideas/IdeaDetailPage'
 import { IdeaDiscoveryPage } from '../../features/ideas/IdeaDiscoveryPage'
+import { SubmitIdeaPage } from '../../features/ideas/SubmitIdeaPage'
+import { IdeaDetailPage } from '../../features/ideas/IdeaDetailPage'
+import { MyIdeasPage } from '../../features/ideas/MyIdeasPage'
 import { IdeaCommunityPage } from '../../features/ideas/IdeaCommunityPage'
 
-function ComingSoonPage({
-  title,
-  description,
-}: {
-  title: string
-  description: string
-}) {
+import { ReviewQueuePage } from '../../features/review/ReviewQueuePage'
+
+import { EvaluationQueuePage } from '../../features/evaluation/EvaluationQueuePage'
+import { EvaluationWorkspacePage } from '../../features/evaluation/EvaluationWorkspacePage'
+
+function PlaceholderPage({ title }: { title: string }) {
   return (
-    <div className="flex min-h-[70vh] items-center justify-center">
-      <div className="w-full max-w-2xl rounded-2xl border border-border bg-card p-10 text-center">
-        <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-          <span className="text-2xl">✦</span>
-        </div>
+    <div className="rounded-xl border border-border bg-card p-8">
+      <p className="text-sm font-medium text-primary">
+        RicozSpark
+      </p>
 
-        <h1 className="text-3xl font-semibold tracking-tight">
-          {title}
-        </h1>
+      <h1 className="mt-2 text-2xl font-semibold">
+        {title}
+      </h1>
 
-        <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-          {description}
-        </p>
-
-        <div className="mt-6 inline-flex rounded-full border border-border bg-muted/40 px-4 py-2 text-sm text-muted-foreground">
-          This RicozSpark module is under development.
-        </div>
-      </div>
+      <p className="mt-2 text-sm text-muted-foreground">
+        This module is currently under development.
+      </p>
     </div>
   )
 }
 
-function AppRoutes() {
+export function AppRoutes() {
   return (
     <Routes>
-      {/* =====================================================
+      {/* =========================
           PUBLIC ROUTES
-      ===================================================== */}
+          ========================= */}
 
       <Route
         path="/login"
@@ -59,194 +54,163 @@ function AppRoutes() {
         element={<SignupPage />}
       />
 
-      {/* =====================================================
-          PROTECTED APPLICATION ROUTES
-      ===================================================== */}
+      <Route
+        path="/forgot-password"
+        element={<ForgotPasswordPage />}
+      />
+
+      <Route
+        path="/reset-password"
+        element={<ResetPasswordPage />}
+      />
+
+      {/* =========================
+          PROTECTED ROUTES
+          ========================= */}
 
       <Route element={<ProtectedRoute />}>
-        <Route element={<Outlet />}>
+        {/* Dashboard */}
 
-          {/* =================================================
-              DASHBOARD
-          ================================================= */}
+        <Route
+          path="/"
+          element={<DashboardPage />}
+        />
 
-          <Route
-            path="/"
-            element={<DashboardPage />}
-          />
+        {/* =========================
+            IDEAS
+            ========================= */}
 
-          {/* =================================================
-              IDEAS
-          ================================================= */}
+        <Route
+          path="/ideas"
+          element={<IdeaDiscoveryPage />}
+        />
 
-          <Route
-            path="/ideas"
-            element={<IdeaDiscoveryPage />}
-          />
+        <Route
+          path="/ideas/new"
+          element={<SubmitIdeaPage />}
+        />
 
-          <Route
-            path="/ideas/new"
-            element={<SubmitIdeaPage />}
-          />
+        <Route
+          path="/ideas/trending"
+          element={<IdeaDiscoveryPage />}
+        />
 
-          <Route
-            path="/ideas/trending"
-            element={
-              <ComingSoonPage
-                title="Trending Ideas"
-                description="Explore ideas gaining attention across the organization based on community activity and engagement."
-              />
-            }
-          />
+        <Route
+          path="/ideas/recent"
+          element={<IdeaDiscoveryPage />}
+        />
 
-          <Route
-            path="/ideas/recent"
-            element={
-              <ComingSoonPage
-                title="Recent Ideas"
-                description="View the latest ideas submitted by employees across the organization."
-              />
-            }
-          />
+        <Route
+          path="/ideas/my"
+          element={<MyIdeasPage />}
+        />
 
-          <Route
-            path="/ideas/my"
-            element={<MyIdeasPage />}
-          />
+        {/* IMPORTANT:
+            Community route comes before :ideaId
+        */}
 
-          {/* =================================================
-              IDEA COMMUNITY
-              IMPORTANT:
-              This route must appear before the generic
-              /ideas/:ideaId route.
-          ================================================= */}
+        <Route
+          path="/ideas/:ideaId/community"
+          element={<IdeaCommunityPage />}
+        />
 
-          <Route
-            path="/ideas/:ideaId/community"
-            element={<IdeaCommunityPage />}
-          />
+        <Route
+          path="/ideas/:ideaId"
+          element={<IdeaDetailPage />}
+        />
 
-          {/* =================================================
-              IDEA DETAIL
-          ================================================= */}
+        {/* =========================
+            INNOVATION
+            ========================= */}
 
-          <Route
-            path="/ideas/:ideaId"
-            element={<IdeaDetailPage />}
-          />
+        <Route
+          path="/review"
+          element={<ReviewQueuePage />}
+        />
 
-          {/* =================================================
-              INNOVATION
-          ================================================= */}
+        {/* Evaluation Queue */}
 
-          <Route
-            path="/review"
-            element={
-              <ComingSoonPage
-                title="Review Queue"
-                description="Review submitted ideas, request additional information, assign reviewers, and move ideas into structured evaluation."
-              />
-            }
-          />
+        <Route
+          path="/evaluation"
+          element={<EvaluationQueuePage />}
+        />
 
-          <Route
-            path="/evaluation"
-            element={
-              <ComingSoonPage
-                title="Evaluation"
-                description="Evaluate ideas using configurable weighted criteria such as business impact, feasibility, innovation, strategic alignment, and cost efficiency."
-              />
-            }
-          />
+        {/* Evaluation Workspace */}
 
-          <Route
-            path="/pipeline"
-            element={
-              <ComingSoonPage
-                title="Innovation Pipeline"
-                description="Track ideas from submission and evaluation through approval, planning, and project execution."
-              />
-            }
-          />
+        <Route
+          path="/evaluation/:ideaId"
+          element={<EvaluationWorkspacePage />}
+        />
 
-          <Route
-            path="/projects"
-            element={
-              <ComingSoonPage
-                title="Projects"
-                description="Manage approved innovation initiatives with teams, tasks, milestones, risks, files, and project activity."
-              />
-            }
-          />
+        {/* Innovation Pipeline */}
 
-          {/* =================================================
-              INSIGHTS
-          ================================================= */}
+        <Route
+          path="/pipeline"
+          element={
+            <PlaceholderPage title="Innovation Pipeline" />
+          }
+        />
 
-          <Route
-            path="/analytics"
-            element={
-              <ComingSoonPage
-                title="Analytics"
-                description="Measure innovation activity, participation, pipeline movement, evaluation performance, and organizational trends using real platform data."
-              />
-            }
-          />
+        {/* Projects */}
 
-          <Route
-            path="/outcomes"
-            element={
-              <ComingSoonPage
-                title="Outcomes"
-                description="Track measurable results such as revenue generated, cost reduction, time saved, productivity improvement, quality, and customer satisfaction."
-              />
-            }
-          />
+        <Route
+          path="/projects"
+          element={
+            <PlaceholderPage title="Projects" />
+          }
+        />
 
-          {/* =================================================
-              COMMUNICATION
-          ================================================= */}
+        {/* =========================
+            INSIGHTS
+            ========================= */}
 
-          <Route
-            path="/notifications"
-            element={
-              <ComingSoonPage
-                title="Notifications"
-                description="Stay informed about idea submissions, reviews, comments, decisions, assignments, project updates, and other RicozSpark activity."
-              />
-            }
-          />
+        <Route
+          path="/analytics"
+          element={
+            <PlaceholderPage title="Analytics" />
+          }
+        />
 
-          {/* =================================================
-              PROFILE & SETTINGS
-          ================================================= */}
+        <Route
+          path="/outcomes"
+          element={
+            <PlaceholderPage title="Outcomes & Impact" />
+          }
+        />
 
-          <Route
-            path="/profile"
-            element={
-              <ComingSoonPage
-                title="Profile"
-                description="Manage your RicozSpark profile, department information, role, and account preferences."
-              />
-            }
-          />
+        {/* =========================
+            COMMUNICATION
+            ========================= */}
 
-          <Route
-            path="/settings"
-            element={
-              <ComingSoonPage
-                title="Settings"
-                description="Manage application preferences and account settings."
-              />
-            }
-          />
+        <Route
+          path="/notifications"
+          element={
+            <PlaceholderPage title="Notifications" />
+          }
+        />
 
-        </Route>
+        {/* =========================
+            USER
+            ========================= */}
+
+        <Route
+          path="/profile"
+          element={
+            <PlaceholderPage title="Profile" />
+          }
+        />
+
+        <Route
+          path="/settings"
+          element={
+            <PlaceholderPage title="Settings" />
+          }
+        />
       </Route>
 
-      {/* =====================================================
+      {/* =========================
           FALLBACK
-      ===================================================== */}
+          ========================= */}
 
       <Route
         path="*"
@@ -255,5 +219,3 @@ function AppRoutes() {
     </Routes>
   )
 }
-
-export { AppRoutes }
